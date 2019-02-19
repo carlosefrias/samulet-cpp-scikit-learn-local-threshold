@@ -93,14 +93,14 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -165,7 +165,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="Sample.py">
+    <CopyFileToFolders Include="LocalThreshold.py">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
