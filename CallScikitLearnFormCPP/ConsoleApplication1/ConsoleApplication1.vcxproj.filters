@@ -28,6 +28,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sample.py" />
+    <CopyFileToFolders Include="LocalThreshold.py" />
+    <CopyFileToFolders Include="2mmBrinell250_31.400_-1.000.tif">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
