@@ -10,37 +10,82 @@
 #include <opencv2/highgui/highgui.hpp>
 
 using namespace cv;
+using namespace std;
 
-PyObject *pName, *pModule, *pDict, *pFunc, *pArgs, *pValue, *path, *resultPath;
+PyObject *pName, *pModule, *pDict, *pFunc, *pArgs, *pValue, *imageArray, *resultPath;
 PyObject *img, *blockSize, *method, *param, *offSet, *thresholdedImg;
-PyArrayObject *imagem;
+PyArrayObject *np_arg;
 int main() 
 {
+	
 	printf("Calling Python from c++\n");
-	const char * programName = "LocalThreshold";
 
 	Py_Initialize();
 
+	//Importing python script
+	const char * programName = "LocalThreshold";
 	pName = PyUnicode_DecodeFSDefault(programName);
 	pModule = PyImport_Import(pName);
 
-	const char *filename = "2mmBrinell250_31.400_-1.000.tif";
+	//const char *filename = "2mmBrinell250_31.400_-1.000.tif";
+	const char *filename = "t19452-09_27.100_-87.700.tif";
 	const char *methodName = "adaptThres";
 
 	if (pModule != NULL) 
 	{
-		pFunc = PyObject_GetAttrString(pModule, methodName); 
-		pArgs = PyTuple_New(6);
+		//Defining the python funtion to use
+		pFunc = PyObject_GetAttrString(pModule, methodName);
+		//Defining the number of arguments of that function
+		pArgs = PyTuple_New(5);
 		
-		cv::Mat image;
+		//Reading the image 
+		cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
+		
+		std::cout <<"C++\t\tmat.data[0]:\t\t"<< (int) mat.data[0] << endl;
+		//...
+		//Image processing before adaptive thresholding
+		//...
 
-		image = cv::imread(filename, IMREAD_UNCHANGED);
+		//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
+		int NumRows = mat.rows;
+		int NumCols = mat.cols;
 
-		const char *pathOriginal = "image.tif";
-		cv::imwrite(pathOriginal, image);
+		std::vector<int> array;
+		if (mat.isContinuous()) {
+			array.assign(mat.datastart, mat.dataend);
+		}
+		else {
+			for (int i = 0; i < mat.rows; ++i) {
+				array.insert(array.end(), mat.ptr<int>(i), mat.ptr<int>(i) + mat.cols);
+			}
+		}
 
-		path = PyUnicode_FromString(pathOriginal);
-		PyTuple_SetItem(pArgs, 0, path);
+		int** a = new int*[NumRows];
+		for (int i = 0; i < NumRows; ++i)
+			a[i] = new int[NumCols];
+
+		int k = 0;
+		for (size_t i = 0; i < NumRows; i++)
+		{
+			for (size_t j = 0; j < NumCols; j++)
+			{
+				a[i][j] = array[k++];
+			}
+		}
+		//End of conversion from Mat to 2d array of int
+		std::cout << "C++\t\ta[0][0]:\t\t" << a[0][0] << std::endl;
+
+		import_array();//this function call is important if we want to send a pyArray to the python function as a parameter
+
+		npy_intp mdim[] = { NumRows, NumCols };
+		//Converting 2d int array to PyArrayObject
+		np_arg = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNewFromData(2, mdim, PyArray_INT, reinterpret_cast<void*>(a)));
+
+		//Converting PyArrayObject to PyObject
+		imageArray = reinterpret_cast<PyObject*>(np_arg);
+
+		//Defining all the arguments of the python function
+		PyTuple_SetItem(pArgs, 0, imageArray);
 		int block_size = 201;
 		blockSize = PyLong_FromLong(block_size);
 		PyTuple_SetItem(pArgs, 1, blockSize);
@@ -52,19 +97,12 @@ int main()
 		PyTuple_SetItem(pArgs, 3, param);
 		int off_set = 0;
 		offSet = PyLong_FromLong(off_set);
-		PyTuple_SetItem(pArgs, 4, offSet);		
-		const char *pathResult = "ThreseholdedImg.tif";
-		resultPath = PyUnicode_FromString(pathResult);
-		PyTuple_SetItem(pArgs, 5, resultPath);
+		PyTuple_SetItem(pArgs, 4, offSet);
 		
-		PyObject_CallObject(pFunc, pArgs);
-
-		cv::Mat resultImg = cv::imread(pathResult, IMREAD_UNCHANGED);
-
-		namedWindow("Display window", WINDOW_AUTOSIZE);
-		imshow("Display window", resultImg);
-
-		waitKey(0);
+		//Calling the python funtion
+		pValue = PyObject_CallObject(pFunc, pArgs);
+		
+		printf("end...");
 	}	
 	Py_DECREF(pName);
 	Py_DECREF(pArgs);
@@ -73,36 +111,3 @@ int main()
 	Py_Finalize();
 	return 0;
 }
-
-
-
-//Define the 2d array (image)
-//npy_intp Dims[2];
-//Dims[0] = 1024;
-//Dims[1] = 1024;
-
-//import_array();
-//
-//// PyArray_SimpleNew allocates the memory needed for the array.
-//img = PyArray_SimpleNew(2, Dims, NPY_LONG);
-
-//// The pointer to the array data is accessed using PyArray_DATA()
-//long *p = (long *)PyArray_DATA(img);
-//long **X_test = new long*[1024];
-//
-////TODO: populate the X_Test array with the actual image values
-//for (int i = 0; i < image.rows; i++) 
-//{
-//	for (int j = 0; i < image.cols; j++) 
-//	{
-//		//std::cout << image.at<uchar>(i, j) << std::endl;
-//		X_test[i][j] = image.at<uchar>(i, j);
-//	}
-//}
-
-//// Copy the data from the "array of arrays" to the contiguous numpy array.
-//for (int k = 0; k < 1024; ++k) 
-//{
-//	memcpy(p, X_test[k], sizeof(long) * 1024);
-//	p += 1024;
-//}

@@ -35,18 +35,18 @@ Mat adaptive_threshold(Mat image)
 	return result;
 }
 
-int main()
-{
-	Mat image, binary;
-	string fname;
-	cout << "Enter name of file:";
-	cin >> fname;
-	image = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
-	binary = adaptive_threshold(image);
-	namedWindow("Original",WINDOW_AUTOSIZE);
-	imshow("Original",image);
-	namedWindow("Binary",WINDOW_AUTOSIZE);
-	imshow("Binary",binary);
-	waitKey(0);
-	return 0;
-}
+//int main()
+//{
+//	Mat image, binary;
+//	string fname;
+//	cout << "Enter name of file:";
+//	cin >> fname;
+//	image = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+//	binary = adaptive_threshold(image);
+//	namedWindow("Original",WINDOW_AUTOSIZE);
+//	imshow("Original",image);
+//	namedWindow("Binary",WINDOW_AUTOSIZE);
+//	imshow("Binary",binary);
+//	waitKey(0);
+//	return 0;
+//}
