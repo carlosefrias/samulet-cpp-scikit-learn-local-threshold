@@ -4,6 +4,7 @@
 #include "pch.h"
 #include <iostream>
 #include <Python.h>
+#include <chrono>
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 #include <opencv2/core/core.hpp>
@@ -12,14 +13,9 @@
 using namespace cv;
 using namespace std;
 
-PyObject *pName, *pModule, *pDict, *pFunc, *pArgs, *pValue, *imageArray, *resultPath;
-PyObject *img, *blockSize, *method, *param, *offSet, *thresholdedImg;
-PyArrayObject *np_arg;
-int main() 
+PyObject *pName, *pModule, *pFunc, *pArgs, *pValue, *img, *blockSize, *method, *param, *offSet, *thresholdedImg, *ArgsArray;
+int main()
 {
-	
-	printf("Calling Python from c++\n");
-
 	Py_Initialize();
 
 	//Importing python script
@@ -31,38 +27,44 @@ int main()
 	const char *filename = "t19452-09_27.100_-87.700.tif";
 	const char *methodName = "adaptThres";
 
-	if (pModule != NULL) 
+	if (pModule != NULL)
 	{
 		//Defining the python funtion to use
 		pFunc = PyObject_GetAttrString(pModule, methodName);
 		//Defining the number of arguments of that function
 		pArgs = PyTuple_New(5);
-		
+
 		//Reading the image 
 		cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
-		
-		std::cout <<"C++\t\tmat.data[0]:\t\t"<< (int) mat.data[0] << endl;
+
 		//...
 		//Image processing before adaptive thresholding
 		//...
+
+		import_array();//this function call is important if we want to send a pyArray to the python function as a parameter
+		
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 		//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
 		int NumRows = mat.rows;
 		int NumCols = mat.cols;
 
-		std::vector<int> array;
-		if (mat.isContinuous()) {
+		std::vector<long> array;
+		if (mat.isContinuous()) 
+		{
 			array.assign(mat.datastart, mat.dataend);
 		}
-		else {
-			for (int i = 0; i < mat.rows; ++i) {
-				array.insert(array.end(), mat.ptr<int>(i), mat.ptr<int>(i) + mat.cols);
+		else 
+		{
+			for (int i = 0; i < mat.rows; ++i) 
+			{
+				array.insert(array.end(), mat.ptr<long>(i), mat.ptr<long>(i) + mat.cols);
 			}
 		}
 
-		int** a = new int*[NumRows];
+		long** a = new long*[NumRows];
 		for (int i = 0; i < NumRows; ++i)
-			a[i] = new int[NumCols];
+			a[i] = new long[NumCols];
 
 		int k = 0;
 		for (size_t i = 0; i < NumRows; i++)
@@ -73,19 +75,23 @@ int main()
 			}
 		}
 		//End of conversion from Mat to 2d array of int
-		std::cout << "C++\t\ta[0][0]:\t\t" << a[0][0] << std::endl;
-
-		import_array();//this function call is important if we want to send a pyArray to the python function as a parameter
-
 		npy_intp mdim[] = { NumRows, NumCols };
-		//Converting 2d int array to PyArrayObject
-		np_arg = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNewFromData(2, mdim, PyArray_INT, reinterpret_cast<void*>(a)));
 
-		//Converting PyArrayObject to PyObject
-		imageArray = reinterpret_cast<PyObject*>(np_arg);
+		// PyArray_SimpleNew allocates the memory needed for the array.
+		ArgsArray = PyArray_SimpleNew(2, mdim, NPY_INT);
+
+		// The pointer to the array data is accessed using PyArray_DATA()
+		long* p = (long*)PyArray_DATA(ArgsArray);
+
+		// Copy the data from the "array of arrays" to the contiguous numpy array.
+		for (int k = 0; k < NumRows; ++k) 
+		{
+			memcpy(p, a[k], sizeof(long) * NumCols);
+			p += NumCols;
+		}
 
 		//Defining all the arguments of the python function
-		PyTuple_SetItem(pArgs, 0, imageArray);
+		PyTuple_SetItem(pArgs, 0, ArgsArray);
 		int block_size = 201;
 		blockSize = PyLong_FromLong(block_size);
 		PyTuple_SetItem(pArgs, 1, blockSize);
@@ -98,12 +104,28 @@ int main()
 		int off_set = 0;
 		offSet = PyLong_FromLong(off_set);
 		PyTuple_SetItem(pArgs, 4, offSet);
-		
+
 		//Calling the python funtion
 		pValue = PyObject_CallObject(pFunc, pArgs);
-		
-		printf("end...");
-	}	
+		npy_intp* dims = PyArray_DIMS(pValue);
+		NumRows = dims[0];
+		NumCols = dims[1];
+		bool* ptr = (bool*)PyArray_DATA(pValue);
+		//endResult is the 2d bool matrix resulted from calling the python threshold_local		
+		bool** endResult = new bool*[NumRows];
+		for (int i = 0; i < NumRows; ++i)
+			endResult[i] = new bool[NumCols];
+		k = 0;
+		for (size_t i = 0; i < NumRows; i++)
+		{
+			for (size_t j = 0; j < NumCols; j++)
+			{
+				endResult[i][j] = ptr[k++];
+			}
+		}
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+	}
 	Py_DECREF(pName);
 	Py_DECREF(pArgs);
 	Py_DECREF(pFunc);
