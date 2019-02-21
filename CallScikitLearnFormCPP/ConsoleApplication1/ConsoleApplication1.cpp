@@ -1,6 +1,3 @@
-// ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "pch.h"
 #include <iostream>
 #include <Python.h>
@@ -19,8 +16,75 @@
 using namespace cv;
 using namespace std;
 
-PyObject *pName, *pModule, *pFunc, *pArgs, *pValue, *img, *blockSize, *method, *param, *offSet, *thresholdedImg, *ArgsArray;
 int main()
+{
+	//Doing the adaptive threshold using python scikit-learn threshold_local function
+	//Wrapping python in c++
+	//pythonWrapper();
+
+	//const char *filename = "2mmBrinell250_31.400_-1.000.tif";
+	const char *filename = "t19452-09_27.100_-87.700.tif";
+	//Reading the image 
+	cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
+
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
+	int NumRows = mat.rows;
+	int NumCols = mat.cols;
+
+	std::vector<long> array;
+	if (mat.isContinuous()) 
+	{
+		array.assign(mat.datastart, mat.dataend);
+	}
+	else 
+	{
+		for (int i = 0; i < mat.rows; ++i) 
+		{
+			array.insert(array.end(), mat.ptr<long>(i), mat.ptr<long>(i) + mat.cols);
+		}
+	}
+
+	long** a = new long*[NumRows];
+	for (int i = 0; i < NumRows; ++i)
+		a[i] = new long[NumCols];
+
+	int k = 0;
+	for (size_t i = 0; i < NumRows; i++)
+	{
+		for (size_t j = 0; j < NumCols; j++)
+		{
+			a[i][j] = array[k++];
+		}
+	}
+
+	//Converting the 2D long array (image) to a emxArray_uint16_T* (1st parameter of the Threshold function)
+	emxArray_uint16_T *X;
+	X = emxCreate_uint16_T(NumRows, NumCols);
+	for (size_t i = 0; i < NumRows; i++)
+	{
+		for (size_t j = 0; j < NumCols; j++)
+		{
+			X->data[NumRows * i + j] = a[i][j];
+		}
+	}
+
+	//Result will contain the result of the matlab Threshold function
+	emxArray_real_T *Result;
+	emxInitArray_real_T(&Result, 2);
+	//Calling the matlab Threshold function
+	Threshold(X, 0.5, 0, Result);
+	//In the Result is the output of the matlab Threshold function
+
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+
+	return 0;
+}
+
+PyObject *pName, *pModule, *pFunc, *pArgs, *pValue, *img, *blockSize, *method, *param, *offSet, *thresholdedImg, *ArgsArray;
+int pythonWrapper() 
 {
 	Py_Initialize();
 
@@ -42,13 +106,13 @@ int main()
 
 		//Reading the image 
 		cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
-	
+
 		//...
 		//Image processing before adaptive thresholding
 		//...
 
 		import_array();//this function call is important if we want to send a pyArray to the python function as a parameter
-		
+
 
 		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 		//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
@@ -56,13 +120,13 @@ int main()
 		int NumCols = mat.cols;
 
 		std::vector<long> array;
-		if (mat.isContinuous()) 
+		if (mat.isContinuous())
 		{
 			array.assign(mat.datastart, mat.dataend);
 		}
-		else 
+		else
 		{
-			for (int i = 0; i < mat.rows; ++i) 
+			for (int i = 0; i < mat.rows; ++i)
 			{
 				array.insert(array.end(), mat.ptr<long>(i), mat.ptr<long>(i) + mat.cols);
 			}
@@ -81,26 +145,6 @@ int main()
 			}
 		}
 
-		////////Testing matlab thing//////////
-		emxArray_uint16_T *X;
-		X = emxCreate_uint16_T(NumRows, NumCols);
-		for (size_t i = 0; i < NumRows; i++)
-		{
-			for (size_t j = 0; j < NumCols; j++)
-			{
-				X->data[NumRows * i + j] = a[i][j];
-			}
-		}
-
-		emxArray_real_T *Result;
-		emxInitArray_real_T(&Result, 2);
-
-		Threshold(X, 0.5, 0, Result);
-		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
-
-		//////////////////////////////////////
-
 		//End of conversion from Mat to 2d array of int
 		npy_intp mdim[] = { NumRows, NumCols };
 
@@ -111,7 +155,7 @@ int main()
 		long* p = (long*)PyArray_DATA(ArgsArray);
 
 		// Copy the data from the "array of arrays" to the contiguous numpy array.
-		for (int k = 0; k < NumRows; ++k) 
+		for (int k = 0; k < NumRows; ++k)
 		{
 			memcpy(p, a[k], sizeof(long) * NumCols);
 			p += NumCols;
