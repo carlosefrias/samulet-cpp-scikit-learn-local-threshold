@@ -10,6 +10,12 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "rt_nonfinite.h"
+#include "Threshold.h"
+#include "Threshold_terminate.h"
+#include "Threshold_emxAPI.h"
+#include "Threshold_initialize.h"
+
 using namespace cv;
 using namespace std;
 
@@ -43,8 +49,8 @@ int main()
 
 		import_array();//this function call is important if we want to send a pyArray to the python function as a parameter
 		
-		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 		//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
 		int NumRows = mat.rows;
 		int NumCols = mat.cols;
@@ -74,6 +80,27 @@ int main()
 				a[i][j] = array[k++];
 			}
 		}
+
+		////////Testing matlab thing//////////
+		emxArray_uint16_T *X;
+		X = emxCreate_uint16_T(NumRows, NumCols);
+		for (size_t i = 0; i < NumRows; i++)
+		{
+			for (size_t j = 0; j < NumCols; j++)
+			{
+				X->data[NumRows * i + j] = a[i][j];
+			}
+		}
+
+		emxArray_real_T *Result;
+		emxInitArray_real_T(&Result, 2);
+
+		Threshold(X, 0.5, 0, Result);
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+
+		//////////////////////////////////////
+
 		//End of conversion from Mat to 2d array of int
 		npy_intp mdim[] = { NumRows, NumCols };
 
@@ -123,8 +150,6 @@ int main()
 				endResult[i][j] = ptr[k++];
 			}
 		}
-		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
 	}
 	Py_DECREF(pName);
 	Py_DECREF(pArgs);
