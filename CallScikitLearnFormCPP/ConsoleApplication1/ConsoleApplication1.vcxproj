@@ -94,15 +94,15 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;C:\Users\me1cme\Downloads\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;C:\Users\me1cme\Downloads\opencv\build\include;C:\Program Files\MATLAB\R2018b\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;C:\Users\me1cme\Downloads\opencv\build\x64\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world400.lib;opencv_world400d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\Downloads\opencv\build\x64\vc15\lib;C:\Program Files\MATLAB\R2018b\extern\lib;C:\Program Files\MATLAB\R2018b\extern\lib\win64;C:\Program Files\MATLAB\R2018b\extern\lib\win64\microsoft;C:\Program Files\MATLAB\R2018b\extern\lib\win64\mingw64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world400.lib;opencv_world400d.lib;C:\Program Files\MATLAB\R2018b\extern\lib\win64\libMatlabCppSharedLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -155,16 +155,76 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="abs.h" />
+    <ClInclude Include="adaptthresh.h" />
+    <ClInclude Include="diag.h" />
+    <ClInclude Include="imfilter.h" />
+    <ClInclude Include="mod.h" />
+    <ClInclude Include="ordfilt2.h" />
+    <ClInclude Include="padarray.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="repmat.h" />
+    <ClInclude Include="rtGetInf.h" />
+    <ClInclude Include="rtGetNaN.h" />
+    <ClInclude Include="rtwtypes.h" />
+    <ClInclude Include="rt_nonfinite.h" />
+    <ClInclude Include="sqrt.h" />
+    <ClInclude Include="sum.h" />
+    <ClInclude Include="svd.h" />
+    <ClInclude Include="svd1.h" />
+    <ClInclude Include="Threshold.h" />
+    <ClInclude Include="Threshold_emxAPI.h" />
+    <ClInclude Include="Threshold_emxutil.h" />
+    <ClInclude Include="Threshold_initialize.h" />
+    <ClInclude Include="Threshold_rtwutil.h" />
+    <ClInclude Include="Threshold_terminate.h" />
+    <ClInclude Include="Threshold_types.h" />
+    <ClInclude Include="useConstantDim.h" />
+    <ClInclude Include="xaxpy.h" />
+    <ClInclude Include="xdotc.h" />
+    <ClInclude Include="xnrm2.h" />
+    <ClInclude Include="xrot.h" />
+    <ClInclude Include="xrotg.h" />
+    <ClInclude Include="xscal.h" />
+    <ClInclude Include="xswap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="abs.cpp" />
+    <ClCompile Include="adaptthresh.cpp" />
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="diag.cpp" />
+    <ClCompile Include="imfilter.cpp" />
+    <ClCompile Include="mod.cpp" />
+    <ClCompile Include="ordfilt2.cpp" />
+    <ClCompile Include="padarray.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="repmat.cpp" />
+    <ClCompile Include="rtGetInf.cpp" />
+    <ClCompile Include="rtGetNaN.cpp" />
+    <ClCompile Include="rt_nonfinite.cpp" />
+    <ClCompile Include="sqrt.cpp" />
+    <ClCompile Include="sum.cpp" />
+    <ClCompile Include="svd.cpp" />
+    <ClCompile Include="svd1.cpp" />
+    <ClCompile Include="Threshold.cpp" />
+    <ClCompile Include="Threshold_emxAPI.cpp" />
+    <ClCompile Include="Threshold_emxutil.cpp" />
+    <ClCompile Include="Threshold_initialize.cpp" />
+    <ClCompile Include="Threshold_rtwutil.cpp" />
+    <ClCompile Include="Threshold_terminate.cpp" />
+    <ClCompile Include="useConstantDim.cpp" />
+    <ClCompile Include="xaxpy.cpp" />
+    <ClCompile Include="xdotc.cpp" />
+    <ClCompile Include="xnrm2.cpp" />
+    <ClCompile Include="xrot.cpp" />
+    <ClCompile Include="xrotg.cpp" />
+    <ClCompile Include="xscal.cpp" />
+    <ClCompile Include="xswap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="LocalThreshold.py">
@@ -178,6 +238,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="buildInfo.mat" />
+    <None Include="codeInfo.mat" />
+    <None Include="gcGuiReport.mat" />
+    <None Include="rtw_proj.tmw" />
+    <None Include="setup_msvc150.bat" />
+    <None Include="Threshold_ref.rsp" />
+    <None Include="Threshold_rtw.bat" />
+    <None Include="Threshold_rtw.mk" />
+    <None Include="Threshold_rtw.rsp" />
+    <None Include="Threshold_rtw_comp.rsp" />
+    <None Include="Threshold_rtw_ref.rsp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

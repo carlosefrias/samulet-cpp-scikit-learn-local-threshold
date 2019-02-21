@@ -36,7 +36,7 @@ int main()
 
 		//Reading the image 
 		cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
-
+	
 		//...
 		//Image processing before adaptive thresholding
 		//...
