@@ -253,6 +253,12 @@
     <None Include="Threshold_rtw_comp.rsp" />
     <None Include="Threshold_rtw_ref.rsp" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="resultMatlab.tif">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
