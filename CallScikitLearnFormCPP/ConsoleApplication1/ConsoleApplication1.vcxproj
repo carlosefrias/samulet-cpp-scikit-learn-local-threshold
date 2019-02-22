@@ -243,6 +243,11 @@
   <ItemGroup>
     <None Include="buildInfo.mat" />
     <None Include="codeInfo.mat" />
+    <CopyFileToFolders Include="file.csv">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="gcGuiReport.mat" />
     <None Include="rtw_proj.tmw" />
     <None Include="setup_msvc150.bat" />

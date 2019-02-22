@@ -1,8 +1,11 @@
 #include "pch.h"
 #include <iostream>
+#include <fstream>
 #include <Python.h>
 #include <chrono>
 #include <iomanip>
+#include <stdlib.h>
+#include "math.h"
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 #include <opencv2/core/core.hpp>
@@ -14,7 +17,6 @@
 #include "Threshold_terminate.h"
 #include "Threshold_emxAPI.h"
 #include "Threshold_initialize.h"
-#include "adaptthresh.h"
 using namespace cv;
 using namespace std;
 //Adaptive Integral threshold
@@ -298,8 +300,58 @@ UINT16_T getMax(UINT16_T** a, int numRows, int numCols)
 	return max;
 }
 
+bool areEqual(Mat mat, string csvFilename) 
+{
+	//Parsing the csv
+	ifstream data(csvFilename);
+	string line;
+	double **vals = new double*[mat.rows];
+	for (int i = 0; i < mat.rows; ++i)
+		vals[i] = new double[mat.cols];
+	int row = 0;
+	int col = 0;
+	while (getline(data, line))
+	{
+		stringstream lineStream(line);
+		string cell;
+		col = 0;
+		while (getline(lineStream, cell, ','))
+		{
+			vals[row][col++] = atof(cell.c_str());
+			//Checking if width don't match
+			if (col > mat.cols)
+				return false;
+		}
+		row++;
+		//Checking if height don't match
+		if (row > mat.rows)
+			return false;
+	}
+	//Transforming mat to an array
+	double **array = new double*[mat.rows];
+	for (int i = 0; i < mat.rows; ++i)
+		array[i] = new double[mat.cols];
+
+	for (int i = 0; i < mat.rows; ++i)
+		array[i] = mat.ptr<double>(i);
+	//Checking all the values one by one
+	for (size_t i = 0; i < mat.rows; i++)
+	{
+		for (size_t j = 0; j < mat.cols; j++)
+		{
+			if (abs(array[i][j] - vals[i][j]) > 0.0000001)
+				return false;
+		}
+	}
+	return true;
+}
+
 emxArray_uint16_T* Mat_TO_emxArray_uint16_T(Mat mat)
 {
+	//Check this
+	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
+	//To convert types the propper way
+
 	int NumRows = mat.rows;
 	int NumCols = mat.cols;
 
@@ -317,55 +369,54 @@ emxArray_uint16_T* Mat_TO_emxArray_uint16_T(Mat mat)
 	{
 		for (size_t j = 0; j < NumCols; j++)
 		{
-			X->data[NumRows * i + j] = array[i][j];
+			X->data[NumCols * i + j] = array[i][j];
 		}
 	}
 	return X;
 }
+
 Mat emxArray_real_T_To_Mat(emxArray_real_T* Result, int NumRows, int NumCols) 
 {
-	//Convert Result to a Mat again and show the comparasion
+	//Check this
+	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
+	//To convert types the propper way
+
 	double* resArray = new double[NumRows * NumCols];
 	for (size_t i = 0; i < NumRows * NumCols; i++)
 	{
 		resArray[i] = Result->data[i];
 	}
-
-	cout << "Matlab max position: " << resArray[517 * NumCols + 476] << endl;
-	cout << "Matlab min position: " << resArray[1023 * NumCols + 1023] << endl;
-
 	cv::Mat Res(NumRows, NumCols, CV_64F, resArray);
 	std::memcpy(Res.data, resArray, NumRows * NumCols * sizeof(double));
 	return Res;
 }
+
 //Using the matlab to c++ generated code for the adaptive threshold
 void usingMatlabGenCode()
 {
+	//Seting 10 decimal places to be presented when printing floating numbers
 	std::cout << std::fixed;
 	std::cout << std::setprecision(10);
-
 	//const char *filename = "2mmBrinell250_31.400_-1.000.tif";
 	const char *filename = "t19452-09_27.100_-87.700.tif";
 	//Reading the image 
 	cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
-
+	//Starting the chrono clock
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
 	emxArray_uint16_T *X = Mat_TO_emxArray_uint16_T(mat);
-
 	//Result will contain the result of the matlab Threshold function
 	emxArray_real_T *Result;
+	//Initializing emxArray_real_T* array
 	emxInitArray_real_T(&Result, 2);
-
 	//Calling the matlab Threshold function
-	Threshold(X, 0.01, 0, Result);
-	
-	//In the Result is the output of the matlab Threshold function
+	Threshold(X, 0.01, 0, Result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
+	//Convert Result to a Mat object
+	Mat Res = emxArray_real_T_To_Mat(Result, mat.rows, mat.cols);
+	//Stop the chrono clock
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
-
-	Mat Res = emxArray_real_T_To_Mat(Result, mat.rows, mat.cols);
-
+	//Displaying the results
 	double min, max;
 	cv::minMaxLoc(mat, &min, &max);
 	cout << "Original Mat:" << endl;
@@ -377,6 +428,9 @@ void usingMatlabGenCode()
 	cout << "Final Mat:" << endl;
 	cv::minMaxLoc(Res, &min, &max);
 	cout << "min: " << min << "\nmax: " << max << endl;
+	//Checking if the result is equal to the matlab one
+	//file.csv contains the obtained results with matlab with the same image and parameters
+	cout << "results are equal: " << areEqual(Res, "file.csv") << endl;
 }
 
 int main()

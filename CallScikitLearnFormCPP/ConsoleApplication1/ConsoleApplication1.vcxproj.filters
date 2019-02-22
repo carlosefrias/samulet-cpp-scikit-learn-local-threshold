@@ -215,6 +215,7 @@
     <CopyFileToFolders Include="resultMatlab.tif">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="file.csv" />
   </ItemGroup>
   <ItemGroup>
     <None Include="buildInfo.mat" />
