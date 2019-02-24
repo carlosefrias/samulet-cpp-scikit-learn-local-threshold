@@ -11,6 +11,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/types_c.h>
+#include "opencvmex.hpp"
 
 #include "rt_nonfinite.h"
 #include "Threshold.h"
@@ -403,16 +405,19 @@ void usingMatlabGenCode()
 	cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
 	//Starting the chrono clock
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-	//Converting Mat object to a regular 2d array (probably there is a simpler way to do this)
-	emxArray_uint16_T *X = Mat_TO_emxArray_uint16_T(mat);
+	//Converting Mat object to a mxArray
+	//mxArray *X = ocvMxArrayFromImage_int16(mat); (Proper way)
+	emxArray_uint16_T *X = Mat_TO_emxArray_uint16_T(mat); //(my way)
 	//Result will contain the result of the matlab Threshold function
 	emxArray_real_T *Result;
 	//Initializing emxArray_real_T* array
 	emxInitArray_real_T(&Result, 2);
 	//Calling the matlab Threshold function
-	Threshold(X, 0.01, 0, Result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
+	Threshold((emxArray_uint16_T* )X, 0.01, 0, Result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//Convert Result to a Mat object
-	Mat Res = emxArray_real_T_To_Mat(Result, mat.rows, mat.cols);
+	Mat Res;
+	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
+	Res = emxArray_real_T_To_Mat(Result, mat.rows, mat.cols);
 	//Stop the chrono clock
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
@@ -422,7 +427,7 @@ void usingMatlabGenCode()
 	cout << "Original Mat:" << endl;
 	cout << "min: " << min << "\nmax: " << max << endl;
 	cout << "After converting to a emxArray_uint16_T :" << endl;
-	cout << "min: " << getMin(X, mat.rows, mat.cols) << "\nmax: " << getMax(X, mat.rows, mat.cols) << endl;
+	cout << "min: " << getMin((emxArray_uint16_T*)X, mat.rows, mat.cols) << "\nmax: " << getMax((emxArray_uint16_T*)X, mat.rows, mat.cols) << endl;
 	cout << "After Thresholding in a emxArray_real_T format:" << endl;
 	cout << "min: " << getMin(Result, mat.rows, mat.cols) << "\nmax: " << getMax(Result, mat.rows, mat.cols) << endl;
 	cout << "Final Mat:" << endl;
