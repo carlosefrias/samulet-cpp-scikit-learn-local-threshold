@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\libs;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;C:\Users\me1cme\Downloads\opencv\build\include;C:\Program Files\MATLAB\R2018b\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\me1cme\AppData\Local\Programs\Python\Python36\include;C:\Users\me1cme\AppData\Local\Programs\Python\Python36\Lib\site-packages\numpy\core\include;C:\Users\me1cme\Downloads\opencv\build\include;C:\Program Files\MATLAB\R2018b\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
