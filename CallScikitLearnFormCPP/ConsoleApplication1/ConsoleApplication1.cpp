@@ -1,13 +1,15 @@
 #include "pch.h"
 #include <iostream>
 #include <fstream>
+#if RELEASE
 #include <Python.h>
+//#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <numpy/arrayobject.h>
+#endif
 #include <chrono>
 #include <iomanip>
 #include <stdlib.h>
 #include "math.h"
-//#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include <numpy/arrayobject.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -98,6 +100,7 @@ void thresholdIntegral(cv::Mat &inputMat, cv::Mat &outputMat)
 		}
 	}
 }
+#if RELEASE
 PyObject *pName, *pModule, *pFunc, *pArgs, *pValue, *img, *blockSize, *method, *param, *offSet, *thresholdedImg, *ArgsArray;
 int pythonWrapper()
 {
@@ -217,6 +220,7 @@ int pythonWrapper()
 	Py_Finalize();
 	return 0;
 }
+#endif
 double getMax(emxArray_real_T *matrix, int numRows, int numCols)
 {
 	double max = DBL_MIN;
@@ -406,14 +410,14 @@ void usingMatlabGenCode()
 	//Starting the chrono clock
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a mxArray
-	//mxArray *X = ocvMxArrayFromImage_int16(mat); (Proper way)
+	//mxArray *X = ocvMxArrayFromImage_int16(mat); //(Proper way)
 	emxArray_uint16_T *X = Mat_TO_emxArray_uint16_T(mat); //(my way)
 	//Result will contain the result of the matlab Threshold function
 	emxArray_real_T *Result;
 	//Initializing emxArray_real_T* array
 	emxInitArray_real_T(&Result, 2);
 	//Calling the matlab Threshold function
-	Threshold((emxArray_uint16_T* )X, 0.01, 0, Result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
+	Threshold(X, 0.01, 0, Result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//Convert Result to a Mat object
 	Mat Res;
 	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
