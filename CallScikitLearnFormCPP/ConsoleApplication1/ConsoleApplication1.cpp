@@ -431,7 +431,7 @@ void usingMatlabGenCode()
 	cout << "Original Mat:" << endl;
 	cout << "min: " << min << "\nmax: " << max << endl;
 	cout << "After converting to a emxArray_uint16_T :" << endl;
-	cout << "min: " << getMin((emxArray_uint16_T*)X, mat.rows, mat.cols) << "\nmax: " << getMax((emxArray_uint16_T*)X, mat.rows, mat.cols) << endl;
+	cout << "min: " << getMin(X, mat.rows, mat.cols) << "\nmax: " << getMax(X, mat.rows, mat.cols) << endl;
 	cout << "After Thresholding in a emxArray_real_T format:" << endl;
 	cout << "min: " << getMin(Result, mat.rows, mat.cols) << "\nmax: " << getMax(Result, mat.rows, mat.cols) << endl;
 	cout << "Final Mat:" << endl;
