@@ -1,7 +1,7 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2018b">
-  <configuration build-checksum="3824617604" file="C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\Threshold.prj" location="C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting" name="Threshold" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="1224989862" file="C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\binarize.prj" location="C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting" name="binarize" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
-      <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
+      <param.BuiltInstrumentedMex />
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
       <param.WorkingFolder>option.WorkingFolder.Project</param.WorkingFolder>
       <param.SpecifiedWorkingFolder />
@@ -28,11 +28,11 @@
       <param.EnableDebugging>false</param.EnableDebugging>
       <param.GenerateReport>true</param.GenerateReport>
       <param.LaunchReport>false</param.LaunchReport>
-      <param.ReportPotentialDifferences>true</param.ReportPotentialDifferences>
+      <param.ReportPotentialDifferences>false</param.ReportPotentialDifferences>
       <param.DefaultTestFile />
       <param.MergeInstrumentationResults>false</param.MergeInstrumentationResults>
       <param.VerificationMode>option.VerificationMode.None</param.VerificationMode>
-      <param.VerificationStatus>option.VerificationStatus.FailedTest</param.VerificationStatus>
+      <param.VerificationStatus>option.VerificationStatus.Inactive</param.VerificationStatus>
       <param.EnableMexProfiling>false</param.EnableMexProfiling>
       <var.BuiltWithMexProfiling>false</var.BuiltWithMexProfiling>
       <param.CustomSourceCode />
@@ -57,9 +57,9 @@
       <param.EnableOpenMP>true</param.EnableOpenMP>
       <param.InitFltsAndDblsToZero>true</param.InitFltsAndDblsToZero>
       <param.ConstantInputs>option.ConstantInputs.CheckValues</param.ConstantInputs>
-      <param.EnableCRICodeCoverage>false</param.EnableCRICodeCoverage>
+      <param.EnableCRICodeCoverage>true</param.EnableCRICodeCoverage>
       <param.EnableJIT>false</param.EnableJIT>
-      <param.EnableJITSilentBailOut>false</param.EnableJITSilentBailOut>
+      <param.EnableJITSilentBailOut />
       <param.CheckForIssuesJIT>true</param.CheckForIssuesJIT>
       <unset>
         <param.BuiltInstrumentedMex />
@@ -93,6 +93,7 @@
         <param.DefaultTestFile />
         <param.MergeInstrumentationResults />
         <param.VerificationMode />
+        <param.VerificationStatus />
         <param.EnableMexProfiling />
         <var.BuiltWithMexProfiling />
         <param.CustomSourceCode />
@@ -117,6 +118,7 @@
         <param.EnableOpenMP />
         <param.InitFltsAndDblsToZero />
         <param.ConstantInputs />
+        <param.EnableCRICodeCoverage />
         <param.EnableJIT />
         <param.EnableJITSilentBailOut />
         <param.CheckForIssuesJIT />
@@ -170,7 +172,7 @@
       <param.GenerateCodeReplacementReport>false</param.GenerateCodeReplacementReport>
       <param.HighlightPotentialDataTypeIssues>false</param.HighlightPotentialDataTypeIssues>
       <param.LaunchReport>false</param.LaunchReport>
-      <param.ReportPotentialDifferences>true</param.ReportPotentialDifferences>
+      <param.ReportPotentialDifferences>false</param.ReportPotentialDifferences>
       <param.SILDebugging>false</param.SILDebugging>
       <param.SILPILCheckConstantInputs>true</param.SILPILCheckConstantInputs>
       <param.SILPILSyncGlobalData>true</param.SILPILSyncGlobalData>
@@ -188,9 +190,9 @@
       <param.CustomSource />
       <param.CustomLibrary />
       <param.PostCodeGenCommand />
-      <param.TargetLangStandard>C99 (ISO)</param.TargetLangStandard>
+      <param.TargetLangStandard>C++03 (ISO)</param.TargetLangStandard>
       <param.CodeReplacementLibrary>None</param.CodeReplacementLibrary>
-      <param.DeprecatedCRLFlag />
+      <param.DeprecatedCRLFlag>false</param.DeprecatedCRLFlag>
       <param.SameHardware>true</param.SameHardware>
       <param.Toolchain>Automatically locate an installed toolchain</param.Toolchain>
       <param.BuildConfiguration>Faster Builds</param.BuildConfiguration>
@@ -201,8 +203,8 @@
       <param.target.ActiveTarget />
       <param.HardwareVendor.Production>Generic</param.HardwareVendor.Production>
       <param.HardwareType.Production>MATLAB Host Computer</param.HardwareType.Production>
-      <param.HWDeviceType.Production />
-      <var.instance.enabled.Production />
+      <param.HWDeviceType.Production>Generic-&gt;MATLAB Host Computer</param.HWDeviceType.Production>
+      <var.instance.enabled.Production>true</var.instance.enabled.Production>
       <param.HardwareSizeChar.Production>8</param.HardwareSizeChar.Production>
       <param.HardwareSizeShort.Production>16</param.HardwareSizeShort.Production>
       <param.HardwareSizeInt.Production>32</param.HardwareSizeInt.Production>
@@ -222,7 +224,7 @@
       <param.HardwareDivisionRounding.Production>option.HardwareDivisionRounding.Zero</param.HardwareDivisionRounding.Production>
       <param.HardwareVendor.Target>Generic</param.HardwareVendor.Target>
       <param.HardwareType.Target>MATLAB Host Computer</param.HardwareType.Target>
-      <param.HWDeviceType.Target />
+      <param.HWDeviceType.Target>Generic-&gt;MATLAB Host Computer</param.HWDeviceType.Target>
       <var.instance.enabled.Target>false</var.instance.enabled.Target>
       <param.HardwareSizeChar.Target>8</param.HardwareSizeChar.Target>
       <param.HardwareSizeShort.Target>16</param.HardwareSizeShort.Target>
@@ -274,14 +276,14 @@
       <param.GenerateDefaultInSwitch>false</param.GenerateDefaultInSwitch>
       <param.EnableTraceability>true</param.EnableTraceability>
       <param.UseECoderFeatures>false</param.UseECoderFeatures>
-      <param.psCustomPrjState />
+      <param.psCustomPrjState>false</param.psCustomPrjState>
       <param.psCustomProjectFile />
-      <param.psCheckConfValue />
-      <param.psUniqueOutPutState />
-      <param.psOpenResultsState />
-      <param.psProductModeValue />
-      <param.psQuickConfValue />
-      <param.psOutputFolder />
+      <param.psCheckConfValue>option.psCheckConfValue.onWarnCheckConfDlg</param.psCheckConfValue>
+      <param.psUniqueOutPutState>true</param.psUniqueOutPutState>
+      <param.psOpenResultsState>true</param.psOpenResultsState>
+      <param.psProductModeValue>option.psProductModeValue.codeProver</param.psProductModeValue>
+      <param.psQuickConfValue>option.psQuickConfValue.proj</param.psQuickConfValue>
+      <param.psOutputFolder>results_$codegenName$</param.psOutputFolder>
       <unset>
         <param.WorkingFolder />
         <param.SpecifiedWorkingFolder />
@@ -774,14 +776,12 @@
       </unset>
     </profile>
     <param.objective>option.objective.c</param.objective>
-    <param.WorkflowStep>verifyCompatibility</param.WorkflowStep>
-    <param.TestSnippets>
-      <item>Threshold</item>
-    </param.TestSnippets>
+    <param.WorkflowStep>workflowSummary</param.WorkflowStep>
+    <param.TestSnippets />
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
     <param.ExternalFcnMajority>column</param.ExternalFcnMajority>
     <param.UseGlobals>option.UseGlobals.No</param.UseGlobals>
-    <param.outputfile>${PROJECT_ROOT}\codegen\lib\Threshold\Threshold.lib</param.outputfile>
+    <param.outputfile>${PROJECT_ROOT}\codegen\lib\binarize\binarize.lib</param.outputfile>
     <param.version>R2012a</param.version>
     <param.HasECoderFeatures>false</param.HasECoderFeatures>
     <param.HasGpuCoder>true</param.HasGpuCoder>
@@ -796,32 +796,31 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>1700801641</param.AnnotationChecksum>
+    <param.AnnotationChecksum>4124844077</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
     <var.redirectedInputTypeData />
     <var.DismissScreener>false</var.DismissScreener>
     <param.unifiedParamStorage />
-    <var.gc.lastOutputRoot />
-    <var.gc.lastOutputType />
-    <var.gc.preBuildChecksum />
-    <var.cfi.lastOutputRoot>codegen\mex\Threshold</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>3824617604</var.cfi.preBuildChecksum>
-    <var.lastCfiTestSnippet>Threshold</var.lastCfiTestSnippet>
+    <var.gc.lastOutputRoot>codegen\lib\binarize</var.gc.lastOutputRoot>
+    <var.gc.lastOutputType>C_CODE</var.gc.lastOutputType>
+    <var.gc.preBuildChecksum>2265118739</var.gc.preBuildChecksum>
+    <var.cfi.lastOutputRoot />
+    <var.cfi.preBuildChecksum />
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum />
-    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\Threshold.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\binarize.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;193192254&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\binarize.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.NoDefaultJIT>false</param.NoDefaultJIT>
     <param.configImportActive>false</param.configImportActive>
     <var.isGpuCoder>false</var.isGpuCoder>
     <var.notGpuCoder>true</var.notGpuCoder>
     <var.boundToGui>true</var.boundToGui>
-    <param.mex.outputfile>Threshold_mex</param.mex.outputfile>
-    <param.grt.outputfile>Threshold</param.grt.outputfile>
+    <param.mex.outputfile>binarize_mex</param.mex.outputfile>
+    <param.grt.outputfile>binarize</param.grt.outputfile>
     <param.artifact>option.target.artifact.lib</param.artifact>
-    <param.outputfile>${PROJECT_ROOT}\codegen\lib\Threshold\Threshold.lib</param.outputfile>
+    <param.outputfile>${PROJECT_ROOT}\codegen\lib\binarize\binarize.lib</param.outputfile>
     <param.gpu.Enabled>false</param.gpu.Enabled>
     <param.gpu.KernelNamePrefix />
     <param.gpu.SelectCudaDevice>-1</param.gpu.SelectCudaDevice>
@@ -832,7 +831,7 @@
     <param.gpu.EnableCUSOLVER>true</param.gpu.EnableCUSOLVER>
     <param.gpu.EnableCUFFT>true</param.gpu.EnableCUFFT>
     <param.gpu.Benchmarking>false</param.gpu.Benchmarking>
-    <param.gpu.SafeBuild>true</param.gpu.SafeBuild>
+    <param.gpu.SafeBuild>false</param.gpu.SafeBuild>
     <param.gpu.ComputeCapability>3.5</param.gpu.ComputeCapability>
     <param.gpu.CustomComputeCapability />
     <param.gpu.CompilerFlags />
@@ -840,14 +839,14 @@
     <var.hasGpu>true</var.hasGpu>
     <var.isDeepLearningForMatlabCoderEnabled>true</var.isDeepLearningForMatlabCoderEnabled>
     <param.deeplearning.TargetLib>option.deeplearning.targetlibrary.none</param.deeplearning.TargetLib>
-    <var.hideTensorRT>true</var.hideTensorRT>
+    <var.hideTensorRT>false</var.hideTensorRT>
     <var.hasMatlabDeepLearningSupportPackage>true</var.hasMatlabDeepLearningSupportPackage>
     <var.hasGpuDeepLearningSupportPackage>true</var.hasGpuDeepLearningSupportPackage>
     <param.tensorrt.DataType>option.tensorrt.datatype.fp32</param.tensorrt.DataType>
     <param.tensorrt.DataPath />
     <param.tensorrt.NumCalibrationBatches>1</param.tensorrt.NumCalibrationBatches>
     <param.cudnn.AutoTuning>true</param.cudnn.AutoTuning>
-    <param.TargetLang>option.TargetLang.C</param.TargetLang>
+    <param.TargetLang>option.TargetLang.CPP</param.TargetLang>
     <param.EnableAutoExtrinsicCalls>true</param.EnableAutoExtrinsicCalls>
     <param.UsePreconditions>false</param.UsePreconditions>
     <param.FeatureFlags />
@@ -896,6 +895,7 @@
     <param.FixedPointUseDesignRanges>false</param.FixedPointUseDesignRanges>
     <unset>
       <param.objective />
+      <param.TestSnippets />
       <param.DefaultImportExportVariable />
       <param.ExternalFcnMajority />
       <param.UseGlobals />
@@ -920,11 +920,9 @@
       <var.redirectedInputTypeData />
       <var.DismissScreener />
       <param.unifiedParamStorage />
-      <var.gc.lastOutputRoot />
-      <var.gc.lastOutputType />
-      <var.gc.preBuildChecksum />
+      <var.cfi.lastOutputRoot />
+      <var.cfi.preBuildChecksum />
       <var.outdatedOnRestore />
-      <var.lastUserSourceChecksum />
       <param.forceMexBuild />
       <param.NoDefaultJIT />
       <param.configImportActive />
@@ -950,13 +948,13 @@
       <var.hasGpu />
       <var.isDeepLearningForMatlabCoderEnabled />
       <param.deeplearning.TargetLib />
+      <var.hideTensorRT />
       <var.hasMatlabDeepLearningSupportPackage />
       <var.hasGpuDeepLearningSupportPackage />
       <param.tensorrt.DataType />
       <param.tensorrt.DataPath />
       <param.tensorrt.NumCalibrationBatches />
       <param.cudnn.AutoTuning />
-      <param.TargetLang />
       <param.EnableAutoExtrinsicCalls />
       <param.UsePreconditions />
       <param.FeatureFlags />
@@ -1004,17 +1002,16 @@
       <param.FixedPointUseDesignRanges />
     </unset>
     <fileset.entrypoints>
-      <file custom-data-expanded="false" value="${PROJECT_ROOT}\Threshold.m">
-        <Marker>1552047776858</Marker>
+      <file custom-data-expanded="false" value="${PROJECT_ROOT}\binarize.m">
+        <Marker>1552048187879</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
     <fileset.inputtypes>
-      <file custom-data-expanded="false" value="${PROJECT_ROOT}\Threshold.m">
-        <Inputs fileName="Threshold.m" functionName="Threshold" nargout="1">
+      <file custom-data-expanded="false" value="${PROJECT_ROOT}\binarize.m">
+        <Inputs fileName="binarize.m" functionName="binarize" nargout="1">
           <Input Name="X" typeId="0" />
-          <Input Name="sensitivity" typeId="1" />
-          <Input Name="mode" typeId="2" />
+          <Input Name="T" typeId="0" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>
@@ -1025,29 +1022,12 @@
               <Complex>false</Complex>
               <Sparse>false</Sparse>
             </type>
-            <type typeId="1">
-              <Class>double</Class>
-              <Size>1 x 1</Size>
-              <Value />
-              <InitialValue />
-              <UserDefined>true</UserDefined>
-              <Complex>false</Complex>
-              <Sparse>false</Sparse>
-            </type>
-            <type typeId="2">
-              <Class>int8</Class>
-              <Size>1 x 1</Size>
-              <Value />
-              <InitialValue />
-              <UserDefined>true</UserDefined>
-              <Complex>false</Complex>
-            </type>
           </idpTable>
         </Inputs>
       </file>
     </fileset.inputtypes>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\codegen\lib\Threshold" name="Threshold.lib" optional="false">C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\codegen\lib\Threshold\Threshold.lib</file>
+      <file location="${PROJECT_ROOT}\codegen\lib\binarize" name="binarize.lib" optional="false">C:\Users\me1cme\repos\samulet-cpp-scikit-learn-adaptive-threshold\MatabTesting\codegen\lib\binarize\binarize.lib</file>
     </build-deliverables>
     <workflow />
     <matlab>

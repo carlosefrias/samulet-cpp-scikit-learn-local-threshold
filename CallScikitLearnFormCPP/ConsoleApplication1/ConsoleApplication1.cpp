@@ -25,43 +25,38 @@ using namespace cv;
 using namespace std;
 //Adaptive Integral threshold
 //Code retrieved from https://github.com/phryniszak/AdaptiveIntegralThresholding/blob/master/main.cpp
-void thresholdIntegral(cv::Mat &inputMat, cv::Mat &outputMat)
+void threshold_integral(Mat &input_mat, Mat &output_mat)
 {
 	// accept only char type matrices
-	CV_Assert(!inputMat.empty());
-	CV_Assert(inputMat.depth() == CV_8U);
-	CV_Assert(inputMat.channels() == 1);
-	CV_Assert(!outputMat.empty());
-	CV_Assert(outputMat.depth() == CV_8U);
-	CV_Assert(outputMat.channels() == 1);
+	CV_Assert(!input_mat.empty());
+	CV_Assert(input_mat.depth() == CV_8U);
+	CV_Assert(input_mat.channels() == 1);
+	CV_Assert(!output_mat.empty());
+	CV_Assert(output_mat.depth() == CV_8U);
+	CV_Assert(output_mat.channels() == 1);
 
 	// rows -> height -> y
-	int nRows = inputMat.rows;
+	auto nRows = input_mat.rows;
 	// cols -> width -> x
-	int nCols = inputMat.cols;
+	auto nCols = input_mat.cols;
 
 	// create the integral image
-	cv::Mat sumMat;
-	cv::integral(inputMat, sumMat);
+	cv::Mat sum_mat;
+	cv::integral(input_mat, sum_mat);
 
-	CV_Assert(sumMat.depth() == CV_32S);
+	CV_Assert(sum_mat.depth() == CV_32S);
 	CV_Assert(sizeof(int) == 4);
 
-	int S = MAX(nRows, nCols) / 8;
-	double T = 0.15;
+	const auto s = MAX(nRows, nCols) / 8;
+	const auto t = 0.15;
 
 	// perform thresholding
-	int s2 = S / 2;
-	int x1, y1, x2, y2, count, sum;
+	const auto s2 = s / 2;
 
-	// CV_Assert(sizeof(int) == 4);
-	int *p_y1, *p_y2;
-	uchar *p_inputMat, *p_outputMat;
-
-	for (int i = 0; i < nRows; ++i)
+	for (auto i = 0; i < nRows; ++i)
 	{
-		y1 = i - s2;
-		y2 = i + s2;
+		auto y1 = i - s2;
+		auto y2 = i + s2;
 
 		if (y1 < 0) {
 			y1 = 0;
@@ -70,16 +65,16 @@ void thresholdIntegral(cv::Mat &inputMat, cv::Mat &outputMat)
 			y2 = nRows - 1;
 		}
 
-		p_y1 = sumMat.ptr<int>(y1);
-		p_y2 = sumMat.ptr<int>(y2);
-		p_inputMat = inputMat.ptr<uchar>(i);
-		p_outputMat = outputMat.ptr<uchar>(i);
+		const auto p_y1 = sum_mat.ptr<int>(y1);
+		const auto p_y2 = sum_mat.ptr<int>(y2);
+		const auto p_input_mat = input_mat.ptr<uchar>(i);
+		const auto p_output_mat = output_mat.ptr<uchar>(i);
 
-		for (int j = 0; j < nCols; ++j)
+		for (auto j = 0; j < nCols; ++j)
 		{
 			// set the SxS region
-			x1 = j - s2;
-			x2 = j + s2;
+			auto x1 = j - s2;
+			auto x2 = j + s2;
 
 			if (x1 < 0) {
 				x1 = 0;
@@ -88,15 +83,15 @@ void thresholdIntegral(cv::Mat &inputMat, cv::Mat &outputMat)
 				x2 = nCols - 1;
 			}
 
-			count = (x2 - x1)*(y2 - y1);
+			const auto count = (x2 - x1) * (y2 - y1);
 
 			// I(x,y)=s(x2,y2)-s(x1,y2)-s(x2,y1)+s(x1,x1)
-			sum = p_y2[x2] - p_y1[x2] - p_y2[x1] + p_y1[x1];
+			const auto sum = p_y2[x2] - p_y1[x2] - p_y2[x1] + p_y1[x1];
 
-			if ((int)(p_inputMat[j] * count) < (int)(sum*(1.0 - T)))
-				p_outputMat[j] = 255;
+			if (static_cast<int>(p_input_mat[j] * count) < static_cast<int>(sum * (1.0 - t)))
+				p_output_mat[j] = 255;
 			else
-				p_outputMat[j] = 0;
+				p_output_mat[j] = 0;
 		}
 	}
 }
@@ -117,7 +112,7 @@ int pythonWrapper()
 
 	if (pModule != NULL)
 	{
-		//Defining the python funtion to use
+		//Defining the python function to use
 		pFunc = PyObject_GetAttrString(pModule, methodName);
 		//Defining the number of arguments of that function
 		pArgs = PyTuple_New(5);
@@ -194,7 +189,7 @@ int pythonWrapper()
 		offSet = PyLong_FromLong(off_set);
 		PyTuple_SetItem(pArgs, 4, offSet);
 
-		//Calling the python funtion
+		//Calling the python function
 		pValue = PyObject_CallObject(pFunc, pArgs);
 		npy_intp* dims = PyArray_DIMS(pValue);
 		NumRows = dims[0];
@@ -221,13 +216,13 @@ int pythonWrapper()
 	return 0;
 }
 #endif
-double getMax(emxArray_real_T *matrix, int numRows, int numCols)
+double get_max(emxArray_real_T *matrix, const int num_rows, const int num_cols)
 {
-	double max = DBL_MIN;
-	int k = 0;
-	for (size_t i = 0; i < numRows; i++)
+	auto max = DBL_MIN;
+	auto k = 0;
+	for (size_t i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < numCols; j++)
+		for (size_t j = 0; j < num_cols; j++)
 		{
 			if (matrix->data[k] > max)
 			{
@@ -238,13 +233,13 @@ double getMax(emxArray_real_T *matrix, int numRows, int numCols)
 	}
 	return max;
 }
-double getMin(emxArray_real_T *matrix, int numRows, int numCols)
+double get_min(emxArray_real_T *matrix, const int num_rows, const int num_cols)
 {
-	double min = DBL_MAX;
-	int k = 0;
-	for (size_t i = 0; i < numRows; i++)
+	auto min = DBL_MAX;
+	auto k = 0;
+	for (size_t i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < numCols; j++)
+		for (size_t j = 0; j < num_cols; j++)
 		{
 			if (matrix->data[k] < min)
 			{
@@ -256,13 +251,13 @@ double getMin(emxArray_real_T *matrix, int numRows, int numCols)
 	return min;
 }
 
-UINT16_T getMax(emxArray_uint16_T *matrix, int numRows, int numCols)
+UINT16_T get_max(emxArray_uint16_T *matrix, const int num_rows, const int num_cols)
 {
 	UINT16_T max = 0;
-	int k = 0;
-	for (size_t i = 0; i < numRows; i++)
+	auto k = 0;
+	for (size_t i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < numCols; j++)
+		for (size_t j = 0; j < num_cols; j++)
 		{
 			if (matrix->data[k] > max)
 			{
@@ -274,13 +269,13 @@ UINT16_T getMax(emxArray_uint16_T *matrix, int numRows, int numCols)
 	return max;
 }
 
-UINT16_T getMin(emxArray_uint16_T *matrix, int numRows, int numCols)
+UINT16_T get_min(emxArray_uint16_T *matrix, const int num_rows, const int num_cols)
 {
 	UINT16_T min = UINT16_MAX;
-	int k = 0;
-	for (size_t i = 0; i < numRows; i++)
+	auto k = 0;
+	for (size_t i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < numCols; j++)
+		for (size_t j = 0; j < num_cols; j++)
 		{
 			if (matrix->data[k] < min)
 			{
@@ -292,12 +287,12 @@ UINT16_T getMin(emxArray_uint16_T *matrix, int numRows, int numCols)
 	return min;
 }
 
-UINT16_T getMax(UINT16_T** a, int numRows, int numCols)
+UINT16_T get_max(UINT16_T** a, const int num_rows, const int num_cols)
 {
 	UINT16_T max = 0;
-	for (size_t i = 0; i < numRows; i++)
+	for (size_t i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < numCols; j++)
+		for (size_t j = 0; j < num_cols; j++)
 		{
 			if (a[i][j] > max)
 				max = a[i][j];
@@ -306,22 +301,22 @@ UINT16_T getMax(UINT16_T** a, int numRows, int numCols)
 	return max;
 }
 
-bool areEqual(Mat mat, string csvFilename) 
+bool are_equal(Mat mat, string csvFilename) 
 {
 	//Parsing the csv
 	ifstream data(csvFilename);
 	string line;
-	double **vals = new double*[mat.rows];
+	auto vals = new double*[mat.rows];
 	for (int i = 0; i < mat.rows; ++i)
 		vals[i] = new double[mat.cols];
-	int row = 0;
-	int col = 0;
+	auto row = 0;
+	auto col = 0;
 	while (getline(data, line))
 	{
-		stringstream lineStream(line);
+		stringstream line_stream(line);
 		string cell;
 		col = 0;
-		while (getline(lineStream, cell, ','))
+		while (getline(line_stream, cell, ','))
 		{
 			vals[row][col++] = atof(cell.c_str());
 			//Checking if width don't match
@@ -334,11 +329,11 @@ bool areEqual(Mat mat, string csvFilename)
 			return false;
 	}
 	//Transforming mat to an array
-	double **array = new double*[mat.rows];
-	for (int i = 0; i < mat.rows; ++i)
+	auto array = new double*[mat.rows];
+	for (auto i = 0; i < mat.rows; ++i)
 		array[i] = new double[mat.cols];
 
-	for (int i = 0; i < mat.rows; ++i)
+	for (auto i = 0; i < mat.rows; ++i)
 		array[i] = mat.ptr<double>(i);
 	//Checking all the values one by one
 	for (size_t i = 0; i < mat.rows; i++)
@@ -352,94 +347,122 @@ bool areEqual(Mat mat, string csvFilename)
 	return true;
 }
 
-emxArray_uint16_T* Mat_TO_emxArray_uint16_T(Mat mat)
+emxArray_uint16_T* mat_to_emx_array_uint16_t(Mat mat)
 {
 	//Check this
 	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
 	//To convert types the propper way
 
-	int NumRows = mat.rows;
-	int NumCols = mat.cols;
+	const auto num_rows = mat.rows;
+	const auto num_cols = mat.cols;
 
-	UINT16_T **array = new UINT16_T*[mat.rows];
-	for (int i = 0; i < mat.rows; ++i)
+	auto** array = new UINT16_T*[mat.rows];
+	for (auto i = 0; i < mat.rows; ++i)
 		array[i] = new UINT16_T[mat.cols];
 
-	for (int i = 0; i < mat.rows; ++i)
+	for (auto i = 0; i < mat.rows; ++i)
 		array[i] = mat.ptr<UINT16_T>(i);
 
-	//Converting the 2D long array (image) to a emxArray_uint16_T* (1st parameter of the Threshold function)
-	emxArray_uint16_T *X;
-	X = emxCreate_uint16_T(NumRows, NumCols);
-	for (size_t i = 0; i < NumRows; i++)
+	const auto x = emxCreate_uint16_T(num_rows, num_cols);
+	for (size_t i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < NumCols; j++)
+		for (size_t j = 0; j < num_cols; j++)
 		{
-			X->data[NumCols * i + j] = array[i][j];
+			x->data[num_cols * i + j] = array[i][j];
 		}
 	}
-	return X;
+	return x;
 }
 
-Mat emxArray_real_T_To_Mat(emxArray_real_T* Result, int NumRows, int NumCols) 
+auto emx_array_real_t_to_mat(emxArray_real_T* result, const int num_rows, const int num_cols) -> Mat
 {
 	//Check this
 	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
 	//To convert types the propper way
 
-	double* resArray = new double[NumRows * NumCols];
-	for (size_t i = 0; i < NumRows * NumCols; i++)
+	const auto res_array = new double[num_rows * num_cols];
+	for (size_t i = 0; i < num_rows * num_cols; i++)
 	{
-		resArray[i] = Result->data[i];
+		res_array[i] = result->data[i];
 	}
-	cv::Mat Res(NumRows, NumCols, CV_64F, resArray);
-	std::memcpy(Res.data, resArray, NumRows * NumCols * sizeof(double));
-	return Res;
+	Mat res(num_rows, num_cols, CV_64F, res_array);
+	std::memcpy(res.data, res_array, num_rows * num_cols * sizeof(double));
+	return res;
 }
 
-//Using the matlab to c++ generated code for the adaptive threshold
-void usingMatlabGenCode()
+//Using the Matlab to c++ generated code for the adaptive threshold
+auto using_matlab_gen_code() -> void
 {
 	//Seting 10 decimal places to be presented when printing floating numbers
 	std::cout << std::fixed;
 	std::cout << std::setprecision(10);
 	//const char *filename = "2mmBrinell250_31.400_-1.000.tif";
-	const char *filename = "t19452-09_27.100_-87.700.tif";
+	const auto filename = "t19452-09_27.100_-87.700.tif";
 	//Reading the image 
-	cv::Mat mat = cv::imread(filename, IMREAD_UNCHANGED);
+	const auto mat = cv::imread(filename, IMREAD_UNCHANGED);
 	//Starting the chrono clock
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	const auto begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a mxArray
 	//mxArray *X = ocvMxArrayFromImage_int16(mat); //(Proper way)
-	emxArray_uint16_T *X = Mat_TO_emxArray_uint16_T(mat); //(my way)
+	const auto x = mat_to_emx_array_uint16_t(mat); //(my way)
 	//Result will contain the result of the matlab Threshold function
-	emxArray_real_T *Result;
+	emxArray_real_T *result;
 	//Initializing emxArray_real_T* array
-	emxInitArray_real_T(&Result, 2);
+	emxInitArray_real_T(&result, 2);
 	//Calling the matlab Threshold function
-	Threshold(X, 0.01, 0, Result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
-	//Convert Result to a Mat object
-	Mat Res;
+	Threshold(x, 0.01, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
-	Res = emxArray_real_T_To_Mat(Result, mat.rows, mat.cols);
-	//Stop the chrono clock
-	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
-	//Displaying the results
+	const auto res = emx_array_real_t_to_mat(result, mat.rows, mat.cols);
 	double min, max;
 	cv::minMaxLoc(mat, &min, &max);
+	const auto output_array = new double[mat.rows * mat.cols];
+	for (auto i = 0; i < mat.rows; ++i)
+	{
+		for (auto j = 0; j < mat.cols; ++j) {
+			const auto k = mat.cols * i + j;
+			//const auto normalized_pixel_val = (mat.at<UINT16_T>(i,j) - min) / (max - min);
+			const auto pixel_val = mat.at<UINT16_T>(i, j);
+			if (pixel_val >= (result->data[k]) * UINT16_MAX)
+			{
+				output_array[k] = 1.0;
+			}
+			else
+				output_array[k] = 0.0;
+		}
+	}
+	Mat output_mat(mat.rows, mat.cols, CV_64F, output_array);
+	std::memcpy(output_mat.data, output_array, mat.rows * mat.cols * sizeof(double));
+
+	minMaxLoc(output_mat, &min, &max);
+	output_mat.convertTo(output_mat, CV_8UC1, 255);
+	minMaxLoc(output_mat, &min, &max);
+	
+	imwrite("output.tif", output_mat);
+	//
+	//minMaxLoc(mat, &min, &max);
+	//Mat normalized_image;
+	//divide((max - min), mat - min, normalized_image);
+	//Mat binary_image = normalized_image > res;
+	//binary_image.convertTo(binary_image, CV_16UC1, USHRT_MAX);
+	//imwrite("output2.tif", binary_image);
+
+	//Stop the chrono clock
+	const auto end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+	//Displaying the results
+	minMaxLoc(mat, &min, &max);
 	cout << "Original Mat:" << endl;
 	cout << "min: " << min << "\nmax: " << max << endl;
 	cout << "After converting to a emxArray_uint16_T :" << endl;
-	cout << "min: " << getMin(X, mat.rows, mat.cols) << "\nmax: " << getMax(X, mat.rows, mat.cols) << endl;
+	cout << "min: " << get_min(x, mat.rows, mat.cols) << "\nmax: " << get_max(x, mat.rows, mat.cols) << endl;
 	cout << "After Thresholding in a emxArray_real_T format:" << endl;
-	cout << "min: " << getMin(Result, mat.rows, mat.cols) << "\nmax: " << getMax(Result, mat.rows, mat.cols) << endl;
+	cout << "min: " << get_min(result, mat.rows, mat.cols) << "\nmax: " << get_max(result, mat.rows, mat.cols) << endl;
 	cout << "Final Mat:" << endl;
-	cv::minMaxLoc(Res, &min, &max);
+	minMaxLoc(res, &min, &max);
 	cout << "min: " << min << "\nmax: " << max << endl;
 	//Checking if the result is equal to the matlab one
 	//file.csv contains the obtained results with matlab with the same image and parameters
-	cout << "results are equal: " << areEqual(Res, "file.csv") << endl;
+	cout << "results are equal: " << are_equal(res, "file.csv") << endl;
 }
 
 int main()
@@ -449,7 +472,7 @@ int main()
 	//pythonWrapper();
 
 	//Using the matlab to c++ generated code for the adaptive threshold
-	usingMatlabGenCode();
+	using_matlab_gen_code();
 
 	return 0;
 }
