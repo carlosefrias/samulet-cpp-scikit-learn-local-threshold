@@ -6,6 +6,8 @@ function BW = Threshold(X, sensitivity, mode)
     else
         thresMode = 'median';
     end
+%     X = X - min(X(:));
+%     X = X / (max(X(:))-min(X(:)));
     T = adaptthresh(X, sensitivity,'ForegroundPolarity', 'bright','Statistic', thresMode);
     BW = imbinarize(X, T);
 end

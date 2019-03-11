@@ -397,7 +397,8 @@ auto using_matlab_gen_code() -> void
 	std::cout << std::fixed;
 	std::cout << std::setprecision(10);
 	//const char *filename = "2mmBrinell250_31.400_-1.000.tif";
-	const auto filename = "t19452-09_27.100_-87.700.tif";
+	//const auto filename = "FRE103579-T77583-02-aerofoil_6.000_-38.000.tif";
+	const auto filename = "Gaussian.tif";
 	//Reading the image 
 	const auto mat = cv::imread(filename, IMREAD_UNCHANGED);
 	//Starting the chrono clock
@@ -420,9 +421,9 @@ auto using_matlab_gen_code() -> void
 	{
 		for (auto j = 0; j < mat.cols; ++j) {
 			const auto k = mat.cols * i + j;
-			//const auto normalized_pixel_val = (mat.at<UINT16_T>(i,j) - min) / (max - min);
 			const auto pixel_val = mat.at<UINT16_T>(i, j);
-			if (pixel_val >= (result->data[k]) * UINT16_MAX)
+			const auto threshold = result->data[k] * UINT16_MAX * UINT16_MAX / (max - min);
+			if (pixel_val > threshold)
 			{
 				output_array[k] = 1.0;
 			}
@@ -438,13 +439,6 @@ auto using_matlab_gen_code() -> void
 	minMaxLoc(output_mat, &min, &max);
 	
 	imwrite("output.tif", output_mat);
-	//
-	//minMaxLoc(mat, &min, &max);
-	//Mat normalized_image;
-	//divide((max - min), mat - min, normalized_image);
-	//Mat binary_image = normalized_image > res;
-	//binary_image.convertTo(binary_image, CV_16UC1, USHRT_MAX);
-	//imwrite("output2.tif", binary_image);
 
 	//Stop the chrono clock
 	const auto end = std::chrono::steady_clock::now();
