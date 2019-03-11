@@ -301,14 +301,14 @@ UINT16_T get_max(UINT16_T** a, const int num_rows, const int num_cols)
 	return max;
 }
 
-bool are_equal(Mat mat, string csvFilename) 
+double are_equal(double* array, string csvFilename) 
 {
 	//Parsing the csv
 	ifstream data(csvFilename);
 	string line;
-	auto vals = new double*[mat.rows];
-	for (int i = 0; i < mat.rows; ++i)
-		vals[i] = new double[mat.cols];
+	auto vals = new double*[1024];
+	for (int i = 0; i < 1024; ++i)
+		vals[i] = new double[1024];
 	auto row = 0;
 	auto col = 0;
 	while (getline(data, line))
@@ -320,31 +320,26 @@ bool are_equal(Mat mat, string csvFilename)
 		{
 			vals[row][col++] = atof(cell.c_str());
 			//Checking if width don't match
-			if (col > mat.cols)
-				return false;
+			if (col > 1023)
+				break;
 		}
 		row++;
 		//Checking if height don't match
-		if (row > mat.rows)
-			return false;
+		if (row > 1023)
+			break;
 	}
-	//Transforming mat to an array
-	auto array = new double*[mat.rows];
-	for (auto i = 0; i < mat.rows; ++i)
-		array[i] = new double[mat.cols];
-
-	for (auto i = 0; i < mat.rows; ++i)
-		array[i] = mat.ptr<double>(i);
+	auto sum_diff = 0;
 	//Checking all the values one by one
-	for (size_t i = 0; i < mat.rows; i++)
+	for (size_t i = 0; i < 1024; i++)
 	{
-		for (size_t j = 0; j < mat.cols; j++)
+		for (size_t j = 0; j < 1024; j++)
 		{
-			if (abs(array[i][j] - vals[i][j]) > 0.0000001)
-				return false;
+			if (array[1024 * i + j] != vals[i][j])
+				sum_diff++;
 		}
 	}
-	return true;
+	cout << "differences: " << sum_diff << endl;
+	return 100 - 100.0 * sum_diff / (1024.0 * 1024.0);
 }
 
 emxArray_uint16_T* mat_to_emx_array_uint16_t(Mat mat)
@@ -401,6 +396,8 @@ auto using_matlab_gen_code() -> void
 	const auto filename = "Gaussian.tif";
 	//Reading the image 
 	const auto mat = cv::imread(filename, IMREAD_UNCHANGED);
+	double min, max;
+	cv::minMaxLoc(mat, &min, &max);
 	//Starting the chrono clock
 	const auto begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a mxArray
@@ -414,15 +411,14 @@ auto using_matlab_gen_code() -> void
 	Threshold(x, 0.01, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
 	const auto res = emx_array_real_t_to_mat(result, mat.rows, mat.cols);
-	double min, max;
-	cv::minMaxLoc(mat, &min, &max);
 	const auto output_array = new double[mat.rows * mat.cols];
 	for (auto i = 0; i < mat.rows; ++i)
 	{
 		for (auto j = 0; j < mat.cols; ++j) {
 			const auto k = mat.cols * i + j;
 			const auto pixel_val = mat.at<UINT16_T>(i, j);
-			const auto threshold = result->data[k] * UINT16_MAX * UINT16_MAX / (max - min);
+			const auto threshold = min + result->data[k] * UINT16_MAX * UINT16_MAX / (max - min);
+			//const auto threshold = result->data[k];
 			if (pixel_val > threshold)
 			{
 				output_array[k] = 1.0;
@@ -456,7 +452,7 @@ auto using_matlab_gen_code() -> void
 	cout << "min: " << min << "\nmax: " << max << endl;
 	//Checking if the result is equal to the matlab one
 	//file.csv contains the obtained results with matlab with the same image and parameters
-	cout << "results are equal: " << are_equal(res, "file.csv") << endl;
+	cout << "results are equal: " << are_equal(output_array, "file.csv") << endl;
 }
 
 int main()
