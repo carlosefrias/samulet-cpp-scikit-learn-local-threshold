@@ -363,7 +363,7 @@ static void localGaussThresh(const emxArray_real_T *b_I, const double nhoodSize
   }
 }
 
-static void parseOptionalInputs(const emxArray_uint16_T *b_I, double varargin_1,
+static void parseOptionalInputs(const emxArray_real_T *b_I, double varargin_1,
   const char varargin_5_data[], const int varargin_5_size[2], double
   *sensitivity, char statistic_data[], int statistic_size[2], double nhoodSize[2])
 {
@@ -629,7 +629,7 @@ static double rt_remd_snf(double u0, double u1)
   return y;
 }
 
-void adaptthresh(const emxArray_uint16_T *I_, double varargin_1, const char
+void adaptthresh(const emxArray_real_T *I_, double varargin_1, const char
                  varargin_5_data[], const int varargin_5_size[2],
                  emxArray_real_T *T)
 {

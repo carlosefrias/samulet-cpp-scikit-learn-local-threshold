@@ -301,7 +301,7 @@ UINT16_T get_max(UINT16_T** a, const int num_rows, const int num_cols)
 	return max;
 }
 
-double are_equal(double* array, string csvFilename) 
+double are_equal(ushort* array, string csvFilename) 
 {
 	//Parsing the csv
 	ifstream data(csvFilename);
@@ -342,7 +342,7 @@ double are_equal(double* array, string csvFilename)
 	return 100 - 100.0 * sum_diff / (1024.0 * 1024.0);
 }
 
-emxArray_uint16_T* mat_to_emx_array_uint16_t(Mat mat)
+emxArray_real_T* mat_to_emx_array_uint16_t(Mat mat)
 {
 	//Check this
 	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
@@ -351,17 +351,17 @@ emxArray_uint16_T* mat_to_emx_array_uint16_t(Mat mat)
 	const auto num_rows = mat.rows;
 	const auto num_cols = mat.cols;
 
-	auto** array = new UINT16_T*[mat.rows];
+	auto** array = new ushort*[mat.rows];
 	for (auto i = 0; i < mat.rows; ++i)
-		array[i] = new UINT16_T[mat.cols];
+		array[i] = new ushort[mat.cols];
 
 	for (auto i = 0; i < mat.rows; ++i)
-		array[i] = mat.ptr<UINT16_T>(i);
+		array[i] = mat.ptr<ushort>(i);
 
-	const auto x = emxCreate_uint16_T(num_rows, num_cols);
-	for (size_t i = 0; i < num_rows; i++)
+	const auto x = emxCreate_real_T(num_rows, num_cols);
+	for (auto i = 0; i < num_rows; i++)
 	{
-		for (size_t j = 0; j < num_cols; j++)
+		for (auto j = 0; j < num_cols; j++)
 		{
 			x->data[num_cols * i + j] = array[i][j];
 		}
@@ -401,37 +401,39 @@ auto using_matlab_gen_code() -> void
 	//Starting the chrono clock
 	const auto begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a mxArray
-	//mxArray *X = ocvMxArrayFromImage_int16(mat); //(Proper way)
 	const auto x = mat_to_emx_array_uint16_t(mat); //(my way)
 	//Result will contain the result of the matlab Threshold function
 	emxArray_real_T *result;
 	//Initializing emxArray_real_T* array
 	emxInitArray_real_T(&result, 2);
 	//Calling the matlab Threshold function
-	Threshold(x, 0.01, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
+	Threshold(x, 0.9, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
 	const auto res = emx_array_real_t_to_mat(result, mat.rows, mat.cols);
-	const auto output_array = new double[mat.rows * mat.cols];
+	const auto min_t = get_min(result, mat.rows, mat.cols);
+	const auto max_t = get_max(result, mat.rows, mat.cols);
+	cout << "min_t: " << min_t << endl;
+	cout << "max_t: " << max_t << endl;
+	const auto output_array = new ushort[mat.rows * mat.cols];
+	const auto factor = (max > 3000) ? USHRT_MAX / (max - min) : 1.0;
 	for (auto i = 0; i < mat.rows; ++i)
 	{
-		for (auto j = 0; j < mat.cols; ++j) {
+		for (auto j = 0; j < mat.cols; ++j) 
+		{
 			const auto k = mat.cols * i + j;
-			const auto pixel_val = mat.at<UINT16_T>(i, j);
-			const auto threshold = min + result->data[k] * UINT16_MAX * UINT16_MAX / (max - min);
-			//const auto threshold = result->data[k];
+			const auto pixel_val = mat.at<ushort>(i, j);
+			const auto threshold = result->data[k] * USHRT_MAX * factor;
+			//if(pixel_val > 0 && threshold > 0)
+			//	cout << "pixel_val: " << pixel_val << " threshold: " << threshold << endl;
 			if (pixel_val > threshold)
-			{
-				output_array[k] = 1.0;
-			}
-			else
-				output_array[k] = 0.0;
+				output_array[k] = 1;
 		}
 	}
-	Mat output_mat(mat.rows, mat.cols, CV_64F, output_array);
-	std::memcpy(output_mat.data, output_array, mat.rows * mat.cols * sizeof(double));
+	Mat output_mat(mat.rows, mat.cols, CV_16UC1, output_array);
+	std::memcpy(output_mat.data, output_array, mat.rows * mat.cols * sizeof(ushort));
 
 	minMaxLoc(output_mat, &min, &max);
-	output_mat.convertTo(output_mat, CV_8UC1, 255);
+	output_mat.convertTo(output_mat, CV_16UC1, USHRT_MAX);
 	minMaxLoc(output_mat, &min, &max);
 	
 	imwrite("output.tif", output_mat);

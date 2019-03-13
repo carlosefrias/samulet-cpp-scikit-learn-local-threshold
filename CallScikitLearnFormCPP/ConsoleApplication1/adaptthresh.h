@@ -19,7 +19,7 @@
 #include "Threshold_types.h"
 
 /* Function Declarations */
-extern void adaptthresh(const emxArray_uint16_T *I_, double varargin_1, const
+extern void adaptthresh(const emxArray_real_T *I_, double varargin_1, const
   char varargin_5_data[], const int varargin_5_size[2], emxArray_real_T *T);
 
 #endif

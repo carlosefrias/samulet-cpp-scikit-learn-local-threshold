@@ -15,7 +15,7 @@
 #include "adaptthresh.h"
 
 /* Function Definitions */
-void Threshold(const emxArray_uint16_T *X, double sensitivity, signed char mode,
+void Threshold(const emxArray_real_T *X, double sensitivity, signed char mode,
                emxArray_real_T *T)
 {
   int thresMode_size[2];

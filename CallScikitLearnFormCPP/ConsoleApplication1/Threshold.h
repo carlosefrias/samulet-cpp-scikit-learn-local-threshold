@@ -19,7 +19,7 @@
 #include "Threshold_types.h"
 
 /* Function Declarations */
-extern void Threshold(const emxArray_uint16_T *X, double sensitivity, signed
+extern void Threshold(const emxArray_real_T *X, double sensitivity, signed
                       char mode, emxArray_real_T *T);
 
 #endif
