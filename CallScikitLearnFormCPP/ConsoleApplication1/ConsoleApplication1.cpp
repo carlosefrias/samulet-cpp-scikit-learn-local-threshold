@@ -398,16 +398,30 @@ auto using_matlab_gen_code() -> void
 	const auto mat = cv::imread(filename, IMREAD_UNCHANGED);
 	double min, max;
 	cv::minMaxLoc(mat, &min, &max);
+	cv::Mat normalized_source_image = cv::Mat::zeros(mat.rows, mat.cols, CV_32F);
+	//Normalize sourceImage
+	for(auto r = 0; r < mat.rows; r++)
+	{
+		for (auto c = 0; c < mat.cols; c++)
+		{
+			auto& normalized_value = normalized_source_image.at<float>(r, c);
+			normalized_value = (mat.at<ushort>(r, c) - min) / (max - min);
+		}
+	}
+	double norm_min, norm_max;
+	cv::minMaxLoc(normalized_source_image, &norm_min, &norm_max);
 	//Starting the chrono clock
 	const auto begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a mxArray
-	const auto x = mat_to_emx_array_uint16_t(mat); //(my way)
+	//const auto x = mat_to_emx_array_uint16_t(normalized_source_image); //(my way)
+	//const auto x = mat_to_emx_array_uint16_t(mat); //(my way)
+	const auto x = mat_to_emx_array_uint16_t(normalized_source_image); //(my way)
 	//Result will contain the result of the matlab Threshold function
 	emxArray_real_T *result;
 	//Initializing emxArray_real_T* array
 	emxInitArray_real_T(&result, 2);
 	//Calling the matlab Threshold function
-	Threshold(x, 0.9, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
+	Threshold(x, 0.01, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
 	const auto res = emx_array_real_t_to_mat(result, mat.rows, mat.cols);
 	const auto min_t = get_min(result, mat.rows, mat.cols);
@@ -415,14 +429,18 @@ auto using_matlab_gen_code() -> void
 	cout << "min_t: " << min_t << endl;
 	cout << "max_t: " << max_t << endl;
 	const auto output_array = new ushort[mat.rows * mat.cols];
-	const auto factor = (max > 3000) ? USHRT_MAX / (max - min) : 1.0;
+	const auto factor = USHRT_MAX / (max - min);
+	cout << "factor: " << factor << endl;
 	for (auto i = 0; i < mat.rows; ++i)
 	{
 		for (auto j = 0; j < mat.cols; ++j) 
 		{
 			const auto k = mat.cols * i + j;
-			const auto pixel_val = mat.at<ushort>(i, j);
-			const auto threshold = result->data[k] * USHRT_MAX * factor;
+			//const auto pixel_val = mat.at<ushort>(i, j);
+			const auto pixel_val = static_cast<double>(normalized_source_image.at<float>(i, j));
+			const auto threshold = result->data[k] * factor;
+
+			//std::cout << typeid(threshold).name() << endl;
 			//if(pixel_val > 0 && threshold > 0)
 			//	cout << "pixel_val: " << pixel_val << " threshold: " << threshold << endl;
 			if (pixel_val > threshold)
