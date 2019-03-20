@@ -369,6 +369,49 @@ emxArray_real_T* mat_to_emx_array_uint16_t(Mat mat)
 	return x;
 }
 
+emxArray_real_T* mat_to_emx_array_real_t(Mat mat)
+{
+	//Check this
+	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
+	//To convert types the propper way
+
+	const auto num_rows = mat.rows;
+	const auto num_cols = mat.cols;
+
+	auto** array = new double*[mat.rows];
+	for (auto i = 0; i < mat.rows; ++i)
+		array[i] = new double[mat.cols];
+
+	for (auto i = 0; i < mat.rows; ++i)
+		array[i] = mat.ptr<double>(i);
+
+	const auto x = emxCreate_real_T(num_rows, num_cols);
+	for (auto i = 0; i < num_rows; i++)
+	{
+		for (auto j = 0; j < num_cols; j++)
+		{
+			x->data[num_cols * i + j] = array[i][j];
+		}
+	}
+	return x;
+
+	// matlab compatable
+	//const auto matlab_input = emxCreate_real_T(mat.rows, mat.cols);
+	//// copy
+	//for (auto r = 0; r < mat.rows; r++)
+	//{
+	//	const float * row_ptr = mat.ptr<float>(r);
+
+	//	const int bytes = sizeof(float) * mat.rows;
+	//	const auto ptr_offset = mat.rows * r;
+
+	//	const auto p = matlab_input->data + ptr_offset;
+	//	memcpy(p, row_ptr, bytes);
+	//}
+	//return matlab_input;
+}
+
+
 auto emx_array_real_t_to_mat(emxArray_real_T* result, const int num_rows, const int num_cols) -> Mat
 {
 	//Check this
@@ -391,88 +434,87 @@ auto using_matlab_gen_code() -> void
 	//Seting 10 decimal places to be presented when printing floating numbers
 	std::cout << std::fixed;
 	std::cout << std::setprecision(10);
-	//const char *filename = "2mmBrinell250_31.400_-1.000.tif";
-	//const auto filename = "FRE103579-T77583-02-aerofoil_6.000_-38.000.tif";
 	const auto filename = "Gaussian.tif";
 	//Reading the image 
 	const auto mat = cv::imread(filename, IMREAD_UNCHANGED);
 	double min, max;
 	cv::minMaxLoc(mat, &min, &max);
-	cv::Mat normalized_source_image = cv::Mat::zeros(mat.rows, mat.cols, CV_32F);
+	std::cout << "Original Mat:" << endl;
+	std::cout << "min: " << min << "\nmax: " << max << endl;
+	cv::Mat normalized_source_image = cv::Mat::zeros(mat.rows, mat.cols, CV_64FC1);
 	//Normalize sourceImage
 	for(auto r = 0; r < mat.rows; r++)
 	{
 		for (auto c = 0; c < mat.cols; c++)
 		{
-			auto& normalized_value = normalized_source_image.at<float>(r, c);
+			auto& normalized_value = normalized_source_image.at<double>(r, c);
 			normalized_value = (mat.at<ushort>(r, c) - min) / (max - min);
 		}
 	}
 	double norm_min, norm_max;
 	cv::minMaxLoc(normalized_source_image, &norm_min, &norm_max);
+	std::cout << "Normalized Mat:" << endl;
+	std::cout << "norm_min: " << norm_min << "\nnorm_max: " << norm_max << endl;
+
 	//Starting the chrono clock
 	const auto begin = std::chrono::steady_clock::now();
 	//Converting Mat object to a mxArray
-	//const auto x = mat_to_emx_array_uint16_t(normalized_source_image); //(my way)
+	const auto x = mat_to_emx_array_real_t(normalized_source_image);
 	//const auto x = mat_to_emx_array_uint16_t(mat); //(my way)
-	const auto x = mat_to_emx_array_uint16_t(normalized_source_image); //(my way)
-	//Result will contain the result of the matlab Threshold function
+	std::cout << "Normalized emx_array before threshold:" << endl;
+	std::cout << "min: " << get_min(x, mat.rows, mat.cols) << "\nmax: " << get_max(x, mat.rows, mat.cols) << endl;
+
 	emxArray_real_T *result;
 	//Initializing emxArray_real_T* array
 	emxInitArray_real_T(&result, 2);
 	//Calling the matlab Threshold function
 	Threshold(x, 0.01, 0, result); //3rd parameter is the mode: 0-mean; 1-gaussian; 2-median
 	//ocvMxArrayToMat_double((mxArray*) Result, &Res);
-	const auto res = emx_array_real_t_to_mat(result, mat.rows, mat.cols);
 	const auto min_t = get_min(result, mat.rows, mat.cols);
 	const auto max_t = get_max(result, mat.rows, mat.cols);
-	cout << "min_t: " << min_t << endl;
-	cout << "max_t: " << max_t << endl;
-	const auto output_array = new ushort[mat.rows * mat.cols];
-	const auto factor = USHRT_MAX / (max - min);
-	cout << "factor: " << factor << endl;
-	for (auto i = 0; i < mat.rows; ++i)
-	{
-		for (auto j = 0; j < mat.cols; ++j) 
-		{
-			const auto k = mat.cols * i + j;
-			//const auto pixel_val = mat.at<ushort>(i, j);
-			const auto pixel_val = static_cast<double>(normalized_source_image.at<float>(i, j));
-			const auto threshold = result->data[k] * factor;
+	std::cout << "Threshold emx_array:" << endl;
+	std::cout << "min_t: " << min_t << "\nmax_t: " << max_t << endl;
 
-			//std::cout << typeid(threshold).name() << endl;
-			//if(pixel_val > 0 && threshold > 0)
-			//	cout << "pixel_val: " << pixel_val << " threshold: " << threshold << endl;
+	cv::Mat threshold_mat = emx_array_real_t_to_mat(result, mat.rows, mat.cols);
+	double max_t_mat, min_t_mat;
+	cv::minMaxLoc(threshold_mat, &min_t_mat, &max_t_mat);
+	std::cout << "Threshold mat:" << endl;
+	std::cout << "min_t_mat: " << min_t_mat << "\nmax_t_mat: " << max_t_mat << endl;
+	threshold_mat.convertTo(threshold_mat, CV_64F);
+	cv::minMaxLoc(threshold_mat, &min_t_mat, &max_t_mat);
+	std::cout << "Threshold mat after conversion to 64 bit:" << endl;
+	std::cout << "min_t_mat: " << min_t_mat << "\nmax_t_mat: " << max_t_mat << endl;
+
+	cv::Mat output = cv::Mat::zeros(mat.rows, mat.cols, CV_16UC1);
+
+	for (auto r = 0; r < mat.rows; ++r)
+	{
+		for (auto c = 0; c < mat.cols; ++c)
+		{
+			const auto pixel_val = normalized_source_image.at<double>(r, c);
+			const auto threshold = threshold_mat.at<double>(r, c) * USHRT_MAX * 3;
+
 			if (pixel_val > threshold)
-				output_array[k] = 1;
+			{
+				auto& output_value = output.at<ushort>(r, c);
+				output_value = 1;
+			}
 		}
 	}
-	Mat output_mat(mat.rows, mat.cols, CV_16UC1, output_array);
-	std::memcpy(output_mat.data, output_array, mat.rows * mat.cols * sizeof(ushort));
 
-	minMaxLoc(output_mat, &min, &max);
-	output_mat.convertTo(output_mat, CV_16UC1, USHRT_MAX);
-	minMaxLoc(output_mat, &min, &max);
+	cv::minMaxLoc(output, &min, &max);
+	output.convertTo(output, CV_16UC1, USHRT_MAX);
+	cv::minMaxLoc(output, &min, &max);
 	
-	imwrite("output.tif", output_mat);
+	cv::imwrite("output.tif", output);
 
 	//Stop the chrono clock
 	const auto end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
 	//Displaying the results
-	minMaxLoc(mat, &min, &max);
-	cout << "Original Mat:" << endl;
-	cout << "min: " << min << "\nmax: " << max << endl;
-	cout << "After converting to a emxArray_uint16_T :" << endl;
-	cout << "min: " << get_min(x, mat.rows, mat.cols) << "\nmax: " << get_max(x, mat.rows, mat.cols) << endl;
-	cout << "After Thresholding in a emxArray_real_T format:" << endl;
-	cout << "min: " << get_min(result, mat.rows, mat.cols) << "\nmax: " << get_max(result, mat.rows, mat.cols) << endl;
-	cout << "Final Mat:" << endl;
-	minMaxLoc(res, &min, &max);
-	cout << "min: " << min << "\nmax: " << max << endl;
-	//Checking if the result is equal to the matlab one
-	//file.csv contains the obtained results with matlab with the same image and parameters
-	cout << "results are equal: " << are_equal(output_array, "file.csv") << endl;
+	cv::minMaxLoc(mat, &min, &max);
+	std::cout << "Final Mat:" << endl;
+	std::cout << "min: " << min << "\nmax: " << max << endl;
 }
 
 int main()
