@@ -442,15 +442,7 @@ auto using_matlab_gen_code() -> void
 	std::cout << "Original Mat:" << endl;
 	std::cout << "min: " << min << "\nmax: " << max << endl;
 	cv::Mat normalized_source_image = cv::Mat::zeros(mat.rows, mat.cols, CV_64FC1);
-	//Normalize sourceImage
-	for(auto r = 0; r < mat.rows; r++)
-	{
-		for (auto c = 0; c < mat.cols; c++)
-		{
-			auto& normalized_value = normalized_source_image.at<double>(r, c);
-			normalized_value = (mat.at<ushort>(r, c) - min) / (max - min);
-		}
-	}
+	mat.convertTo(normalized_source_image, CV_64FC1, 1 / max);
 	double norm_min, norm_max;
 	cv::minMaxLoc(normalized_source_image, &norm_min, &norm_max);
 	std::cout << "Normalized Mat:" << endl;
@@ -487,20 +479,7 @@ auto using_matlab_gen_code() -> void
 
 	cv::Mat output = cv::Mat::zeros(mat.rows, mat.cols, CV_16UC1);
 
-	for (auto r = 0; r < mat.rows; ++r)
-	{
-		for (auto c = 0; c < mat.cols; ++c)
-		{
-			const auto pixel_val = normalized_source_image.at<double>(r, c);
-			const auto threshold = threshold_mat.at<double>(r, c) * USHRT_MAX * 3;
-
-			if (pixel_val > threshold)
-			{
-				auto& output_value = output.at<ushort>(r, c);
-				output_value = 1;
-			}
-		}
-	}
+	output = normalized_source_image > threshold_mat * USHRT_MAX * 3;
 
 	cv::minMaxLoc(output, &min, &max);
 	output.convertTo(output, CV_16UC1, USHRT_MAX);
