@@ -472,14 +472,14 @@ auto using_matlab_gen_code() -> void
 	cv::minMaxLoc(threshold_mat, &min_t_mat, &max_t_mat);
 	std::cout << "Threshold mat:" << endl;
 	std::cout << "min_t_mat: " << min_t_mat << "\nmax_t_mat: " << max_t_mat << endl;
-	threshold_mat.convertTo(threshold_mat, CV_64F);
+	threshold_mat.convertTo(threshold_mat, CV_64F, USHRT_MAX);
 	cv::minMaxLoc(threshold_mat, &min_t_mat, &max_t_mat);
-	std::cout << "Threshold mat after conversion to 64 bit:" << endl;
+	std::cout << "Threshold mat times USHRT_MAX :" << endl;
 	std::cout << "min_t_mat: " << min_t_mat << "\nmax_t_mat: " << max_t_mat << endl;
 
 	cv::Mat output = cv::Mat::zeros(mat.rows, mat.cols, CV_16UC1);
 
-	output = normalized_source_image > threshold_mat * USHRT_MAX * 3;
+	output = normalized_source_image > threshold_mat;
 
 	cv::minMaxLoc(output, &min, &max);
 	output.convertTo(output, CV_16UC1, USHRT_MAX);
