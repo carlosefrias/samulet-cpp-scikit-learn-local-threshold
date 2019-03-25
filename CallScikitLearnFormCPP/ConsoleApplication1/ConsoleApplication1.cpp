@@ -301,53 +301,8 @@ UINT16_T get_max(UINT16_T** a, const int num_rows, const int num_cols)
 	return max;
 }
 
-double are_equal(ushort* array, string csvFilename) 
-{
-	//Parsing the csv
-	ifstream data(csvFilename);
-	string line;
-	auto vals = new double*[1024];
-	for (int i = 0; i < 1024; ++i)
-		vals[i] = new double[1024];
-	auto row = 0;
-	auto col = 0;
-	while (getline(data, line))
-	{
-		stringstream line_stream(line);
-		string cell;
-		col = 0;
-		while (getline(line_stream, cell, ','))
-		{
-			vals[row][col++] = atof(cell.c_str());
-			//Checking if width don't match
-			if (col > 1023)
-				break;
-		}
-		row++;
-		//Checking if height don't match
-		if (row > 1023)
-			break;
-	}
-	auto sum_diff = 0;
-	//Checking all the values one by one
-	for (size_t i = 0; i < 1024; i++)
-	{
-		for (size_t j = 0; j < 1024; j++)
-		{
-			if (array[1024 * i + j] != vals[i][j])
-				sum_diff++;
-		}
-	}
-	cout << "differences: " << sum_diff << endl;
-	return 100 - 100.0 * sum_diff / (1024.0 * 1024.0);
-}
-
 emxArray_real_T* mat_to_emx_array_uint16_t(Mat mat)
 {
-	//Check this
-	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
-	//To convert types the propper way
-
 	const auto num_rows = mat.rows;
 	const auto num_cols = mat.cols;
 
@@ -371,10 +326,6 @@ emxArray_real_T* mat_to_emx_array_uint16_t(Mat mat)
 
 emxArray_real_T* mat_to_emx_array_real_t(Mat mat)
 {
-	//Check this
-	//https://www.mathworks.com/help/vision/opencv-interface-support-package.html
-	//To convert types the propper way
-
 	const auto num_rows = mat.rows;
 	const auto num_cols = mat.cols;
 
@@ -394,21 +345,6 @@ emxArray_real_T* mat_to_emx_array_real_t(Mat mat)
 		}
 	}
 	return x;
-
-	// matlab compatable
-	//const auto matlab_input = emxCreate_real_T(mat.rows, mat.cols);
-	//// copy
-	//for (auto r = 0; r < mat.rows; r++)
-	//{
-	//	const float * row_ptr = mat.ptr<float>(r);
-
-	//	const int bytes = sizeof(float) * mat.rows;
-	//	const auto ptr_offset = mat.rows * r;
-
-	//	const auto p = matlab_input->data + ptr_offset;
-	//	memcpy(p, row_ptr, bytes);
-	//}
-	//return matlab_input;
 }
 
 
